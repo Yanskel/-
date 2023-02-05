@@ -12,6 +12,8 @@ import com.brice.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -29,9 +31,9 @@ public class SetmealController {
 
     /**
      * 新增套餐
-
      */
     @PostMapping
+    @CacheEvict(value = "setmealCache", allEntries = true)
     public R<String> save(@RequestBody SetmealDto setmealDto) {
         log.info("套餐信息：{}", setmealDto);
         setmealService.saveWithDish(setmealDto);
@@ -87,6 +89,7 @@ public class SetmealController {
      * 查询所有套餐
      */
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache", key = "#setmeal.categoryId")
     public R<List<Setmeal>> list(Setmeal setmeal) {
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
@@ -98,13 +101,14 @@ public class SetmealController {
     }
 
     /**
-     * 修改菜品启售状态
+     * 修改套餐启售状态
      *
      * @param flag 启售/停售
-     * @param ids 菜品id
+     * @param ids  菜品id
      * @return 修改成功或失败
      */
     @PostMapping("/status/{flag}")
+    @CacheEvict(value = "setmealCache", allEntries = true)
     public R<String> changeStatus(@PathVariable Integer flag, Long[] ids) {
         List<Setmeal> setmealList = new ArrayList<>();
         for (Long id : ids) {
@@ -122,8 +126,14 @@ public class SetmealController {
         return R.success("修改成功");
     }
 
+    /**
+     * 根据id查询套餐
+     *
+     * @param id 套餐id
+     * @return 套餐信息
+     */
     @GetMapping("/{id}")
-    public R<Setmeal> getById(@PathVariable Long id){
+    public R<Setmeal> getById(@PathVariable Long id) {
         Setmeal setmeal = setmealService.getById(id);
         return R.success(setmeal);
     }

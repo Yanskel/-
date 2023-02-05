@@ -76,9 +76,6 @@ public class LoginCheckFilter implements Filter {
 
     /**
      * 放行判断方法
-     * @param urls
-     * @param requestURI
-     * @return
      */
     public boolean check(String[] urls, String requestURI){
         for (String url : urls) {
