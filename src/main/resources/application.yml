@@ -24,4 +24,4 @@ mybatis-plus:
     db-config:
       id-type: assign_id
 reggie:
-  path: D:/Project/IDEAProject/reggie/img/
+  path: img/

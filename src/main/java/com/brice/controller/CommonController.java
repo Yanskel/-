@@ -1,6 +1,7 @@
 package com.brice.controller;
 
 import com.brice.common.R;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,11 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/common")
 public class CommonController {
@@ -37,7 +37,7 @@ public class CommonController {
         File dir = new File(basePath);
         //如果目录不存在，先创建
         if (!dir.exists()) {
-            dir.mkdirs();
+            log.info("创建文件夹" + dir.mkdirs());
         }
 
         try {
@@ -57,7 +57,7 @@ public class CommonController {
         FileInputStream inputStream = new FileInputStream(basePath + name);
 
         ServletOutputStream outputStream = response.getOutputStream();
-
+        //向响应参数设置文件类型
         response.setContentType("image/jpeg");
 
         //输入流，输出流配合将数据写回浏览器
@@ -65,7 +65,6 @@ public class CommonController {
         byte[] bytes = new byte[1024];
         while ((len = inputStream.read(bytes)) != -1) {
             outputStream.write(bytes, 0, len);
-            outputStream.flush();
         }
 
         outputStream.close();
